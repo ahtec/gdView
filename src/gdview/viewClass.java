@@ -27,7 +27,7 @@ import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-public class main {
+public class viewClass {
 
     public static File imageFile;
     public static JLabel label;
@@ -43,10 +43,18 @@ public class main {
 
     }
 
-    public main() throws IOException {
-        gekozenFileIndex = 0;
-        indexfilesInDirectory = 1;
-        filesInDirectory = getFilesInDirectory(getStartdirectory());
+    public viewClass(String parameterFile) throws IOException {
+        if (parameterFile.compareTo("leeg") == 0) {
+
+            gekozenFileIndex = 0;
+            indexfilesInDirectory = 1;
+            filesInDirectory = getFilesInDirectory(getStartdirectory());
+        } else {
+            gekozenFileIndex = 0;
+            indexfilesInDirectory = 1;
+            filesInDirectory = getFilesInDirectory(parameterFile);
+
+        }
         File f = (File) filesInDirectory.elementAt(gekozenFileIndex);
         indexfilesInDirectory = gekozenFileIndex;
         String absoluutPath = f.getAbsolutePath();
@@ -56,7 +64,7 @@ public class main {
         GraphicsDevice mijnScherm = schermen[0];
         frameHoogte = mijnScherm.getDisplayMode().getHeight();
         schermwijdte = mijnScherm.getDisplayMode().getWidth();
-        frameHoogte = frameHoogte - 50;
+        frameHoogte = frameHoogte - 40;
         schermwijdte = schermwijdte - 50;
 
         frame = new JFrame(absoluutPath);
@@ -74,16 +82,17 @@ public class main {
         frame.setVisible(true);
     }
 
-    public static void main(String[] args) {
-        try {
+    public static void main(String[] args) throws IOException {
+        if (args.length <= 0) {
+            viewClass images = new viewClass("leeg");
+        } else {
+            if (args[0].equalsIgnoreCase("version")) {
+                System.out.println("2021-02-22");
+            } else {
+                viewClass images = new viewClass(args[0]);
+            }
 
-            main images = new main();
-
-            // TODO code application logic here
-        } catch (IOException ex) {
-            Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }
 
     public String getStartdirectory() throws IOException {
@@ -203,44 +212,44 @@ public class main {
             int x = event.getX();
             int y = event.getY();
             int richting = 0;
-//        System.out.println("javaapplication2.muisLuisteraar.mouseReleased() " + main.schaal );
+//        System.out.println("javaapplication2.muisLuisteraar.mouseReleased() " + viewClass.schaal );
 //            System.out.println("javaapplication2.muisLuisteraar.mouseReleased() " + event.getButton());
 
             if (event.getButton() == BUTTON1) {
                 richting = -1;
-                if (main.indexfilesInDirectory == 0) {
+                if (viewClass.indexfilesInDirectory == 0) {
                     richting = 0;
                 };
             } else {
                 richting = 1;
-                if (main.indexfilesInDirectory == filesInDirectory.size() - 1) {
+                if (viewClass.indexfilesInDirectory == filesInDirectory.size() - 1) {
                     richting = 0;
                 };
 
             }
 
-            main.indexfilesInDirectory += richting;
+            viewClass.indexfilesInDirectory += richting;
             if (richting != 0) {
-                File f = (File) filesInDirectory.elementAt(main.indexfilesInDirectory);
+                File f = (File) filesInDirectory.elementAt(viewClass.indexfilesInDirectory);
                 String absoluutPath = f.getAbsolutePath();
-//                System.out.print(main.indexfilesInDirectory);
-//                System.out.print(" " + main.filesInDirectory.size());
+//                System.out.print(viewClass.indexfilesInDirectory);
+//                System.out.print(" " + viewClass.filesInDirectory.size());
 //                System.out.println(" " + f.getName());
 
                 try {
-                    ImageIcon nextOrPrevImageIcon = createImageIcon(absoluutPath, main.frameHoogte, schermwijdte);
-                    main.frame.setTitle(main.indexfilesInDirectory + " " + main.filesInDirectory.size() + " " + absoluutPath);
-                    main.frame.getContentPane().removeAll();
-                    main.label = new JLabel(nextOrPrevImageIcon);
-                    main.frame.getContentPane().add(main.label);
-                    main.frame.pack();
+                    ImageIcon nextOrPrevImageIcon = createImageIcon(absoluutPath, viewClass.frameHoogte, schermwijdte);
+                    viewClass.frame.setTitle(viewClass.indexfilesInDirectory + " " + viewClass.filesInDirectory.size() + " " + absoluutPath);
+                    viewClass.frame.getContentPane().removeAll();
+                    viewClass.label = new JLabel(nextOrPrevImageIcon);
+                    viewClass.frame.getContentPane().add(viewClass.label);
+                    viewClass.frame.pack();
 
                 } catch (IOException ex) {
-                    Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(viewClass.class.getName()).log(Level.SEVERE, null, ex);
                     System.out.println("gdview.main.muisLuisteraar.mouseReleased() io exception" + absoluutPath);
 
                 } catch (NullPointerException e) {
-                    Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, e);
+                    Logger.getLogger(viewClass.class.getName()).log(Level.SEVERE, null, e);
                     System.out.println("gdview.main.muisLuisteraar.mouseReleased() NullPointerException" + absoluutPath);
                 }
 
