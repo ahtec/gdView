@@ -1,13 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package gdview;
 
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import static java.awt.event.MouseEvent.BUTTON1;
 import java.io.File;
@@ -79,6 +76,8 @@ public class viewClass {
         frame.setBounds(0, 0, imageBreedte + 40, imageHoogte + 50);
         muisLuisteraar mijnMuisLuisteraar = new muisLuisteraar();
         frame.addMouseListener(mijnMuisLuisteraar);
+        toetsLuiteraar toetsen = new toetsLuiteraar();
+        frame.addKeyListener(toetsen);
         frame.setVisible(true);
     }
 
@@ -87,7 +86,7 @@ public class viewClass {
             viewClass images = new viewClass("leeg");
         } else {
             if (args[0].equalsIgnoreCase("version")) {
-                System.out.println("2021-02-22");
+                System.out.println("2021-02-22 18 23");
             } else {
                 viewClass images = new viewClass(args[0]);
             }
@@ -214,7 +213,6 @@ public class viewClass {
             int richting = 0;
 //        System.out.println("javaapplication2.muisLuisteraar.mouseReleased() " + viewClass.schaal );
 //            System.out.println("javaapplication2.muisLuisteraar.mouseReleased() " + event.getButton());
-
             if (event.getButton() == BUTTON1) {
                 richting = -1;
                 if (viewClass.indexfilesInDirectory == 0) {
@@ -225,9 +223,7 @@ public class viewClass {
                 if (viewClass.indexfilesInDirectory == filesInDirectory.size() - 1) {
                     richting = 0;
                 };
-
             }
-
             viewClass.indexfilesInDirectory += richting;
             if (richting != 0) {
                 File f = (File) filesInDirectory.elementAt(viewClass.indexfilesInDirectory);
@@ -253,8 +249,95 @@ public class viewClass {
                     System.out.println("gdview.main.muisLuisteraar.mouseReleased() NullPointerException" + absoluutPath);
                 }
 
-            }
+            }//
+
         }
     }
 
+    class toetsLuiteraar extends KeyAdapter {
+
+        String strGetal;
+
+        public toetsLuiteraar() {
+            strGetal = "0";
+        }
+
+        @Override
+        public void keyPressed​(KeyEvent e) {
+            super.keyTyped(e);
+//            System.out.println("toets " + e.getKeyCode());
+            if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                System.exit(0);
+            } else {
+                if (e.getKeyCode() == KeyEvent.VK_0) {
+                    strGetal = strGetal + "0";
+                }
+                if (e.getKeyCode() == KeyEvent.VK_1) {
+                    strGetal = strGetal + "1";
+                }
+                if (e.getKeyCode() == KeyEvent.VK_2) {
+                    strGetal = strGetal + "2";
+                }
+                if (e.getKeyCode() == KeyEvent.VK_3) {
+                    strGetal = strGetal + "3";
+                }
+                if (e.getKeyCode() == KeyEvent.VK_4) {
+                    strGetal = strGetal + "4";
+                }
+                if (e.getKeyCode() == KeyEvent.VK_5) {
+                    strGetal = strGetal + "5";
+                }
+                if (e.getKeyCode() == KeyEvent.VK_6) {
+                    strGetal = strGetal + "6";
+                }
+                if (e.getKeyCode() == KeyEvent.VK_7) {
+                    strGetal = strGetal + "7";
+                }
+                if (e.getKeyCode() == KeyEvent.VK_8) {
+                    strGetal = strGetal + "8";
+                }
+                if (e.getKeyCode() == KeyEvent.VK_9) {
+                    strGetal = strGetal + "9";
+                }
+                if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+                    int lengte = strGetal.length();
+                    lengte--;
+                    if (lengte > 0) {
+                        strGetal = (String) strGetal.subSequence(0, lengte);
+                    }
+                }
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    int getal = 0;
+                    getal = Integer.parseInt(strGetal);
+                    strGetal = "0";
+                    if (getal < viewClass.filesInDirectory.size()) {
+                        viewClass.indexfilesInDirectory = getal;
+                    }
+                    File f = (File) filesInDirectory.elementAt(viewClass.indexfilesInDirectory);
+                    String absoluutPath = f.getAbsolutePath();
+//                System.out.print(viewClass.indexfilesInDirectory);
+//                System.out.print(" " + viewClass.filesInDirectory.size());
+                System.out.println(" " + f.getName());
+
+                    ImageIcon nextOrPrevImageIcon;
+                    try {
+                        nextOrPrevImageIcon = createImageIcon(absoluutPath, viewClass.frameHoogte, schermwijdte);
+                        viewClass.frame.setTitle(viewClass.indexfilesInDirectory + " " + viewClass.filesInDirectory.size() + " " + absoluutPath);
+                        viewClass.frame.getContentPane().removeAll();
+                        viewClass.label = new JLabel(nextOrPrevImageIcon);
+                        viewClass.frame.getContentPane().add(viewClass.label);
+                        viewClass.frame.pack();
+                    } catch (IOException ex) {
+                        Logger.getLogger(viewClass.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (NullPointerException ex) {
+                        Logger.getLogger(viewClass.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
+//                        strGetal = (String) strGetal.subSequence(0, lengte);
+                }
+            }
+
+        }
+
+    }
 }
