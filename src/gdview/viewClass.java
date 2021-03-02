@@ -1,10 +1,7 @@
 package gdview;
 
-import java.awt.Color;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-import java.awt.Image;
-import java.awt.Point;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -30,8 +27,7 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.image.MemoryImageSource;
-import java.security.Timestamp;
-import java.time.zone.ZoneOffsetTransitionRule;
+import java.util.Comparator;
 
 public class viewClass {
 
@@ -70,7 +66,7 @@ public class viewClass {
 
         frame = new JFrame(absoluutPath);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setTitle(viewClass.indexfilesInDirectory + " " + viewClass.maxAantalImages + " " + absoluutPath + " 2021-02-28 v5");
+        frame.setTitle(viewClass.indexfilesInDirectory + " " + viewClass.maxAantalImages + " " + absoluutPath + " 2021-03-2 v7");
 //        frame.setBackground(Color.BLACK);
         pane = new JPanel();
 
@@ -201,13 +197,20 @@ public class viewClass {
         File folder = new File(startDirFile.getAbsolutePath());
         File[] listOfFiles = folder.listFiles();
 
-        Arrays.sort(listOfFiles);
+//        Arrays.sort(listOfFiles);
+        for (File file : listOfFiles) {
+            if (file.isFile()) {
+                System.out.println(file.getName());
+            }
+        }
+        System.out.println("gdview.viewClass.getFilesInDirectory()");
+        Arrays.sort(listOfFiles, Comparator.comparing(File::getName, new FilenameComparator()));
 
-//        for (File file : listOfFiles) {
-//            if (file.isFile()) {
-//                System.out.println(file.getName());
-//            }
-//        }
+        for (File file : listOfFiles) {
+            if (file.isFile()) {
+                System.out.println(file.getName());
+            }
+        }
         try {
             // for each name in the path array
             gekozenFileIndex = 0;
