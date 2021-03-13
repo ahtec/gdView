@@ -20,13 +20,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import java.awt.Cursor;
 import java.awt.Image;
 import java.awt.Point;
-import java.awt.Toolkit;
-import java.awt.image.MemoryImageSource;
+import java.util.Collections;
 import java.util.Comparator;
 
 public class viewClass {
@@ -40,12 +36,14 @@ public class viewClass {
     public static int frameHoogte, schermwijdte;
     public static Vector filesInDirectory;
     public static int gekozenFileIndex;
+    private static boolean recursief;
 
     public viewClass(String parameterFile) throws IOException {
-
+        filesInDirectory = new Vector();
         if (parameterFile.compareTo("leeg") == 0) {
             gekozenFileIndex = 0;
             indexfilesInDirectory = 1;
+            recursief = Boolean.TRUE;
             filesInDirectory = getFilesInDirectory(getStartdirectory());
         } else {
             gekozenFileIndex = 0;
@@ -66,7 +64,7 @@ public class viewClass {
 
         frame = new JFrame(absoluutPath);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setTitle(viewClass.indexfilesInDirectory + " " + viewClass.maxAantalImages + " " + absoluutPath + " 2021-03-2 v7");
+        frame.setTitle(viewClass.indexfilesInDirectory + " " + viewClass.maxAantalImages + " " + absoluutPath + " 2021-mrt-13 v14");
 //        frame.setBackground(Color.BLACK);
         pane = new JPanel();
 
@@ -133,27 +131,35 @@ public class viewClass {
         if (args.length <= 0) {
             viewClass images = new viewClass("leeg");
         } else {
-
-            int[] pixels = new int[16 * 16];
-            Image image = Toolkit.getDefaultToolkit().createImage(new MemoryImageSource(16, 16, pixels, 0, 16));
-            Cursor transparentCursor = Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(0, 0), "invisibleCursor");
+            if (args[0].equalsIgnoreCase("dir")) {
+                viewClass images = new viewClass("dir");
+            }
+//            int[] pixels = new int[16 * 16];
+//            Image image = Toolkit.getDefaultToolkit().createImage(new MemoryImageSource(16, 16, pixels, 0, 16));
+//            Cursor transparentCursor = Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(0, 0), "invisibleCursor");
             viewClass images = new viewClass(args[0]);
-
         }
     }
 
     public String getStartdirectory() throws IOException {
         String eruit = "";
         JFileChooser fc = new JFileChooser();
-        FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                "JPG & GIF Images", "jpg", "gif", "png", "jpeg", "tiff");
-        fc.setFileFilter(filter);
+        if (recursief) {
+            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+        } else {
+            fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+//        FileNameExtensionFilter filter = new FileNameExtensionFilter(
+//                "JPG & GIF Images", "jpg", "gif", "png", "jpeg", "tiff");
+//        fc.setFileFilter(filter);
+        }
         int returnVal = fc.showOpenDialog(pane);
 
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
             eruit = file.getCanonicalPath();
         }
+
         return eruit;
     }
 
@@ -188,44 +194,56 @@ public class viewClass {
         return new ImageIcon(imageVooricon);
     }
 
-    Vector getFilesInDirectory(String erin) {
+    Vector getFilesInDirectory(String erin) throws IOException {
 //        Vector eruit = new Vector();
         File startFile = new File(erin);
-        File startDirFile = startFile.getParentFile();
-        Vector fileVector = new Vector();
-//        System.out.println(startDirFile);
-        File folder = new File(startDirFile.getAbsolutePath());
-        File[] listOfFiles = folder.listFiles();
+        File startDirFile;
+        File[] listOfFiles = null;
+        File folder;
+        Vector fileVector;
+        fileVector = new Vector();
+        recursief = Boolean.FALSE;
+        gekozenFileIndex = 0;
 
-//        Arrays.sort(listOfFiles);
-        for (File file : listOfFiles) {
-            if (file.isFile()) {
-                System.out.println(file.getName());
-            }
-        }
-        System.out.println("gdview.viewClass.getFilesInDirectory()");
-        Arrays.sort(listOfFiles, Comparator.comparing(File::getName, new FilenameComparator()));
+        if (startFile.isDirectory()) {
+            recursief = Boolean.TRUE;
+            getFilesRecursive(startFile); // vult public var filesInDirectory
+            Collections.sort(filesInDirectory, Comparator.comparing(File::getAbsolutePath, new FilenameComparator()));
 
-        for (File file : listOfFiles) {
-            if (file.isFile()) {
-                System.out.println(file.getName());
-            }
-        }
-        try {
+//            for (int i = 0; i < filesInDirectory.size(); i++) {
+//                File f = (File) filesInDirectory.elementAt(i);
+//                String absoluutPath = f.getAbsolutePath();
+//
+////                System.out.println(absoluutPath);
+//            }
+            fileVector = filesInDirectory;
+
+        } else {
+
+            startDirFile = startFile.getParentFile();
+            folder = new File(startDirFile.getAbsolutePath());
+            listOfFiles = folder.listFiles();
+//
+//            Arrays.sort(listOfFiles);
+//            for (File file : listOfFiles) {
+//                if (file.isFile()) {
+//                    System.out.println(file.getName());
+//                }
+//            }
+//            System.out.println("gdview.viewClass.getFilesInDirectory()");
+            Arrays.sort(listOfFiles, Comparator.comparing(File::getName, new FilenameComparator()));
+
+//            for (File file : listOfFiles) {
+//                if (file.isFile()) {
+//                    System.out.println(file.getName());
+//                }
+//            }
             // for each name in the path array
-            gekozenFileIndex = 0;
             for (File fileInDir : listOfFiles) {
                 if (fileInDir.isFile()) {
-                    String extension = fileInDir.getName().substring(fileInDir.getName().lastIndexOf("."));
-                    if (extension.toLowerCase().contains(".png")) {
-//                        System.out.println(fileInDir);
-                        fileVector.addElement(fileInDir);
-                        if (fileInDir.equals(startFile)) {
-                            gekozenFileIndex = fileVector.size() - 1;
-
-                        }
-                    } else {
-                        if (extension.toLowerCase().contains(".jpg")) {
+                    try {
+                        String extension = fileInDir.getName().substring(fileInDir.getName().lastIndexOf("."));
+                        if (extension.toLowerCase().contains(".png")) {
 //                        System.out.println(fileInDir);
                             fileVector.addElement(fileInDir);
                             if (fileInDir.equals(startFile)) {
@@ -233,7 +251,7 @@ public class viewClass {
 
                             }
                         } else {
-                            if (extension.toLowerCase().contains(".jpeg")) {
+                            if (extension.toLowerCase().contains(".jpg")) {
 //                        System.out.println(fileInDir);
                                 fileVector.addElement(fileInDir);
                                 if (fileInDir.equals(startFile)) {
@@ -241,23 +259,32 @@ public class viewClass {
 
                                 }
                             } else {
-                                if (extension.toLowerCase().contains(".tiff")) {
+                                if (extension.toLowerCase().contains(".jpeg")) {
 //                        System.out.println(fileInDir);
                                     fileVector.addElement(fileInDir);
                                     if (fileInDir.equals(startFile)) {
                                         gekozenFileIndex = fileVector.size() - 1;
 
                                     }
+                                } else {
+                                    if (extension.toLowerCase().contains(".tiff")) {
+//                        System.out.println(fileInDir);
+                                        fileVector.addElement(fileInDir);
+                                        if (fileInDir.equals(startFile)) {
+                                            gekozenFileIndex = fileVector.size() - 1;
+
+                                        }
+                                    }
                                 }
                             }
                         }
+                    } catch (java.lang.StringIndexOutOfBoundsException e) {
+                        System.out.println("gdview.viewClass.getFilesInDirectory() out of bounds exception " + fileInDir.getCanonicalPath());
                     }
                 }
+
             }
 
-        } catch (Exception e) {
-//            System.out.println("Error  in getFilesInDirectory");            // if any error occurs
-            e.printStackTrace();
         }
         maxAantalImages = fileVector.size() - 1;
         return fileVector;
@@ -358,5 +385,51 @@ public class viewClass {
                 }
             }
         }
+    }
+
+    private static void getFilesRecursive(File pFile) {
+        for (File files : pFile.listFiles()) {
+            if (files.isDirectory()) {
+                if (recursief) {
+                    getFilesRecursive(files);
+                }
+            } else {
+                if (isImage(files)) {
+                    filesInDirectory.addElement(files);
+                }
+            }
+        }
+
+    }
+
+    static boolean isImage(File erin) {
+
+//        System.out.println("gdview.viewClass.isImage()" + erin.getAbsolutePath());
+        Boolean eruit = Boolean.FALSE;
+        try {
+            String extension = erin.getName().substring(erin.getName().lastIndexOf("."));
+            if (extension.toLowerCase().contains(".png")) {
+                eruit = Boolean.TRUE;
+            } else {
+                if (extension.toLowerCase().contains(".jpg")) {
+                    eruit = Boolean.TRUE;
+                } else {
+                    if (extension.toLowerCase().contains(".jpeg")) {
+                        eruit = Boolean.TRUE;
+                    } else {
+                        if (extension.toLowerCase().contains(".tiff")) {
+                            eruit = Boolean.TRUE;
+                        }
+                    }
+                }
+            }
+        } catch (java.lang.StringIndexOutOfBoundsException e) {
+            try {
+                System.out.println("gdview.viewClass.getFilesInDirectory() out of bounds exception " + erin.getCanonicalPath());
+            } catch (IOException ex) {
+                Logger.getLogger(viewClass.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return eruit;
     }
 }

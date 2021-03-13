@@ -19,6 +19,19 @@ public final class FilenameComparator implements Comparator<String> {
         if (o1 == null || o2 == null)
             return o1 == null ? o2 == null ? 0 : -1 : 1;
 
+        if (o1.startsWith(".")  & o2.startsWith(".")){
+            return (0);
+        }
+        
+        
+        if (o1.startsWith(".") ) {
+            return(-1);
+        }
+        
+        if (o2.startsWith(".") ) {
+            return(1);
+        }
+        
         // Splitting both input strings by the above patterns
         String[] split1 = NUMBERS.split(o1);
         String[] split2 = NUMBERS.split(o2);
