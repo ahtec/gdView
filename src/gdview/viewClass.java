@@ -24,12 +24,13 @@ import java.awt.Image;
 import java.awt.Point;
 import java.util.Collections;
 import java.util.Comparator;
+import javax.swing.JOptionPane;
+
 
 public class viewClass {
 
     public static File imageFile;
     public static JLabel label;
-//    public static double schaal;
     public static JFrame frame;
     static JPanel pane;
     public static int imageHoogte, imageBreedte, indexfilesInDirectory, maxAantalImages;
@@ -37,6 +38,7 @@ public class viewClass {
     public static Vector filesInDirectory;
     public static int gekozenFileIndex;
     private static boolean recursief;
+    String versie = "14 maaart 2021 V15";
 
     public viewClass(String parameterFile) throws IOException {
         filesInDirectory = new Vector();
@@ -51,6 +53,10 @@ public class viewClass {
             filesInDirectory = getFilesInDirectory(parameterFile);
 
         }
+        if (filesInDirectory.isEmpty()){
+                JOptionPane.showMessageDialog(null,"geen imgages gevonden",versie,1);
+//            System.out.println("gdview.viewClass.<init>() geen imgages gevonden");
+        }  else {
         File f = (File) filesInDirectory.elementAt(gekozenFileIndex);
         indexfilesInDirectory = gekozenFileIndex;
         String absoluutPath = f.getAbsolutePath();
@@ -64,7 +70,7 @@ public class viewClass {
 
         frame = new JFrame(absoluutPath);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setTitle(viewClass.indexfilesInDirectory + " " + viewClass.maxAantalImages + " " + absoluutPath + " 2021-mrt-13 v14");
+        frame.setTitle(viewClass.indexfilesInDirectory + " " + viewClass.maxAantalImages + " " + absoluutPath + versie);
 //        frame.setBackground(Color.BLACK);
         pane = new JPanel();
 
@@ -85,6 +91,7 @@ public class viewClass {
         toetsLuiteraar toetsen = new toetsLuiteraar();
         frame.addKeyListener(toetsen);
         frame.setVisible(true);
+        }
     }
 
     public void verwerkNewImage() {
@@ -103,7 +110,7 @@ public class viewClass {
 //            viewClass.frame.getContentPane()1.removeAll();
 //            viewClass.label = new JLabel(nextOrPrevImageIcon);
             viewClass.label.setIcon(nextOrPrevImageIcon);
-            viewClass.frame.getContentPane().add(viewClass.label);
+           viewClass.frame.getContentPane().add(viewClass.label);
 //            viewClass.frame.getContentPane().setBounds(0, 0, imageBreedte, imageHoogte);
 //            System.out.print(" hoogte frame voor bounds  =" + frame.getHeight());
 
@@ -131,9 +138,9 @@ public class viewClass {
         if (args.length <= 0) {
             viewClass images = new viewClass("leeg");
         } else {
-            if (args[0].equalsIgnoreCase("dir")) {
-                viewClass images = new viewClass("dir");
-            }
+//            if (args[0].equalsIgnoreCase("dir")) {
+//                viewClass images = new viewClass("dir");
+//            }
 //            int[] pixels = new int[16 * 16];
 //            Image image = Toolkit.getDefaultToolkit().createImage(new MemoryImageSource(16, 16, pixels, 0, 16));
 //            Cursor transparentCursor = Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(0, 0), "invisibleCursor");
@@ -158,6 +165,8 @@ public class viewClass {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
             eruit = file.getCanonicalPath();
+        }  else {
+                  System.exit(0);
         }
 
         return eruit;
@@ -177,7 +186,8 @@ public class viewClass {
         quotientImageWH = widthImageToBeDisplayed / (double) heightImageToBeDisplayed;
         if (quotientSchermWH > quotientImageWH) {
             // schalen op hoogte
-            imageVooricon = imageToBeDisplayed.getScaledInstance(-1, schermHoogte, Image.SCALE_FAST);
+//            imageVooricon = imageToBeDisplayed.getScaledInstance(-1, schermHoogte, Image.SCALE_FAST);
+            imageVooricon = imageToBeDisplayed.getScaledInstance(-1, schermHoogte, Image.SCALE_SMOOTH);
             imageHoogte = imageVooricon.getHeight(frame);
             imageBreedte = imageVooricon.getWidth(frame);
 //            System.out.print("schalen op hoogte , H = " + imageHoogte + " B=" + imageBreedte + " ");
@@ -185,7 +195,8 @@ public class viewClass {
 
         } else {
             // schalen op breedte
-            imageVooricon = imageToBeDisplayed.getScaledInstance(schermBreedte, -1, Image.SCALE_FAST);
+//            imageVooricon = imageToBeDisplayed.getScaledInstance(schermBreedte, -1, Image.SCALE_FAST);
+            imageVooricon = imageToBeDisplayed.getScaledInstance(schermBreedte, -1, Image.SCALE_SMOOTH);
             imageHoogte = imageVooricon.getHeight(frame);
             imageBreedte = imageVooricon.getWidth(frame);
 //            System.out.print("schalen op breedte , H = " + imageHoogte + " B=" + imageBreedte + " ");
