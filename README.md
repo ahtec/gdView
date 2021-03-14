@@ -19,6 +19,6 @@ When an image is loaded you can navigate with:
   mouseclick left
   mouseclick right
   typing a number ( only on top of keyboard )  and pressing enter 
-    then the image with that number is shown
+    then the image with that number is shown.
     
     
