@@ -26,8 +26,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import javax.swing.JOptionPane;
 
-
-public class viewClass {
+public class viewClass
+{
 
     public static File imageFile;
     public static JLabel label;
@@ -38,106 +38,130 @@ public class viewClass {
     public static Vector filesInDirectory;
     public static int gekozenFileIndex;
     private static boolean recursief;
-    String versie = "14 maaart 2021 V15";
+    String versie = " 22 maart 2021 V19";
 
-    public viewClass(String parameterFile) throws IOException {
+    public viewClass(String parameterFile) throws IOException
+    {
         filesInDirectory = new Vector();
-        if (parameterFile.compareTo("leeg") == 0) {
+        if (parameterFile.compareTo("leeg") == 0)
+        {
             gekozenFileIndex = 0;
             indexfilesInDirectory = 1;
             recursief = Boolean.TRUE;
             filesInDirectory = getFilesInDirectory(getStartdirectory());
-        } else {
+        } else
+        {
             gekozenFileIndex = 0;
             indexfilesInDirectory = 1;
             filesInDirectory = getFilesInDirectory(parameterFile);
-
         }
-        if (filesInDirectory.isEmpty()){
-                JOptionPane.showMessageDialog(null,"geen imgages gevonden",versie,1);
-//            System.out.println("gdview.viewClass.<init>() geen imgages gevonden");
-        }  else {
-        File f = (File) filesInDirectory.elementAt(gekozenFileIndex);
-        indexfilesInDirectory = gekozenFileIndex;
-        String absoluutPath = f.getAbsolutePath();
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice[] schermen = ge.getScreenDevices();
-        GraphicsDevice mijnScherm = schermen[0];
-        frameHoogte = mijnScherm.getDisplayMode().getHeight();
-        schermwijdte = mijnScherm.getDisplayMode().getWidth();
-        frameHoogte = frameHoogte - 40;
-        schermwijdte = schermwijdte - 50;
 
-        frame = new JFrame(absoluutPath);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setTitle(viewClass.indexfilesInDirectory + " " + viewClass.maxAantalImages + " " + absoluutPath + versie);
+        if (filesInDirectory.isEmpty())
+        {
+            JOptionPane.showMessageDialog(null, "Geen imgages gevonden", versie, 1);
+//            System.out.println("gdview.viewClass.<init>() geen imgages gevonden");
+        } else
+        {
+            File f = (File) filesInDirectory.elementAt(gekozenFileIndex);
+            indexfilesInDirectory = gekozenFileIndex;
+            String absoluutPath = f.getAbsolutePath();
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            GraphicsDevice[] schermen = ge.getScreenDevices();
+            GraphicsDevice mijnScherm = schermen[0];
+            frameHoogte = mijnScherm.getDisplayMode().getHeight();
+            schermwijdte = mijnScherm.getDisplayMode().getWidth();
+            frameHoogte = frameHoogte - 40;
+            schermwijdte = schermwijdte - 50;
+            frame = new JFrame(absoluutPath);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setTitle(viewClass.indexfilesInDirectory + " " + viewClass.maxAantalImages + " " + absoluutPath + versie);
 //        frame.setBackground(Color.BLACK);
-        pane = new JPanel();
+            pane = new JPanel();
+
+            FileDrop fileDrop = new FileDrop(frame, new FileDrop.Listener()
+            {
+                public void filesDropped(java.io.File[] files)
+                {
+                    for (int i = 0; i < files.length; i++)
+                    {
+                        if (isImage(files[i]))
+                        {
+                            filesInDirectory.addElement(files[i]);
+                            maxAantalImages++;
+                            indexfilesInDirectory = maxAantalImages;
+                        }
+                    }
+                    verwerkNewImage();
+                }
+            }
+            ); // end FileDrop.Listener
 
 //        pane.setCursor();
-        pane.setLayout(null);
-        label = new JLabel(createImageIcon(absoluutPath, frameHoogte, schermwijdte));
-        frame.setCursor(frame.getToolkit().createCustomCursor(new BufferedImage(3, 3, BufferedImage.TYPE_INT_ARGB), new Point(0, 0), "null"));
-
-        frame.add(pane);
-        frame.getContentPane().add(label);
+            pane.setLayout(null);
+            label = new JLabel(createImageIcon(absoluutPath, frameHoogte, schermwijdte));
+            frame.setCursor(frame.getToolkit().createCustomCursor(new BufferedImage(3, 3, BufferedImage.TYPE_INT_ARGB), new Point(0, 0), "null"));
+            frame.add(pane);
+            frame.getContentPane().add(label);
 //        frame.getContentPane().setBounds(0, 0, imageBreedte, imageHoogte);
-
 //        System.out.println("hoogte frame =" + frame.getHeight());
-        frame.setBounds(0, 0, imageBreedte + 20, imageHoogte + 20);
+            frame.setBounds(0, 0, imageBreedte + 20, imageHoogte + 20);
 //        frame.setBounds(0, 0, imageBreedte , imageHoogte );
-        muisLuisteraar mijnMuisLuisteraar = new muisLuisteraar();
-        frame.addMouseListener(mijnMuisLuisteraar);
-        toetsLuiteraar toetsen = new toetsLuiteraar();
-        frame.addKeyListener(toetsen);
-        frame.setVisible(true);
+            muisLuisteraar mijnMuisLuisteraar = new muisLuisteraar();
+            frame.addMouseListener(mijnMuisLuisteraar);
+            toetsLuiteraar toetsen = new toetsLuiteraar();
+            frame.addKeyListener(toetsen);
+            frame.setVisible(true);
         }
     }
 
-    public void verwerkNewImage() {
+    public void verwerkNewImage()
+    {
         /* gebruikte variabel : indexFilesInDirectory    
      deze methove verwerkt de geselceteerde file in de files in directory array
      van deze file word een icon gemaakt 
     dit icon wordt toegevoegd aan het  frame
          */
-
         File f = (File) filesInDirectory.elementAt(viewClass.indexfilesInDirectory);
         String absoluutPath = f.getAbsolutePath();
-        try {
+        try
+        {
 //            long starttijd = System.currentTimeMillis();
             ImageIcon nextOrPrevImageIcon = createImageIcon(absoluutPath, frameHoogte, schermwijdte);
             viewClass.frame.setTitle(viewClass.indexfilesInDirectory + " " + maxAantalImages + " " + absoluutPath);
 //            viewClass.frame.getContentPane()1.removeAll();
 //            viewClass.label = new JLabel(nextOrPrevImageIcon);
             viewClass.label.setIcon(nextOrPrevImageIcon);
-           viewClass.frame.getContentPane().add(viewClass.label);
+            viewClass.frame.getContentPane().add(viewClass.label);
 //            viewClass.frame.getContentPane().setBounds(0, 0, imageBreedte, imageHoogte);
 //            System.out.print(" hoogte frame voor bounds  =" + frame.getHeight());
-
             frame.setBounds(0, 0, imageBreedte + 20, imageHoogte + 20);
 //            System.out.print(" hoogte frame na bounds  =" + frame.getHeight());
 //            frame.setBounds(0, 0, imageBreedte, imageHoogte); // new 27 feb 2021
             viewClass.frame.setCursor(frame.getToolkit().createCustomCursor(new BufferedImage(3, 3, BufferedImage.TYPE_INT_ARGB), new Point(0, 0), "null"));
-
 //            viewClass.frame.pack();
             frame.setVisible(true);
 //            long eindtijd = System.currentTimeMillis();
 //            System.out.print(" bestede tijd:");
 //            System.out.print(eindtijd - starttijd);
 //            System.out.println(" " + absoluutPath);
-        } catch (IOException ex) {
+        } catch (IOException ex)
+        {
             Logger.getLogger(viewClass.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("gdview.main.muisLuisteraar.mouseReleased() io exception" + absoluutPath);
-        } catch (NullPointerException e) {
+        } catch (NullPointerException e)
+        {
             Logger.getLogger(viewClass.class.getName()).log(Level.SEVERE, null, e);
             System.out.println("gdview.main.muisLuisteraar.mouseReleased() NullPointerException" + absoluutPath);
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        if (args.length <= 0) {
+    public static void main(String[] args) throws IOException
+    {
+        if (args.length <= 0)
+        {
             viewClass images = new viewClass("leeg");
-        } else {
+        } else
+        {
 //            if (args[0].equalsIgnoreCase("dir")) {
 //                viewClass images = new viewClass("dir");
 //            }
@@ -148,31 +172,37 @@ public class viewClass {
         }
     }
 
-    public String getStartdirectory() throws IOException {
+    public String getStartdirectory() throws IOException
+    {
         String eruit = "";
         JFileChooser fc = new JFileChooser();
-        if (recursief) {
-            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+//        if (recursief)
+//        {
+//            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
-        } else {
+//        } else
+//        {
             fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 //        FileNameExtensionFilter filter = new FileNameExtensionFilter(
 //                "JPG & GIF Images", "jpg", "gif", "png", "jpeg", "tiff");
 //        fc.setFileFilter(filter);
-        }
+//        }
         int returnVal = fc.showOpenDialog(pane);
 
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
+        if (returnVal == JFileChooser.APPROVE_OPTION)
+        {
             File file = fc.getSelectedFile();
             eruit = file.getCanonicalPath();
-        }  else {
-                  System.exit(0);
+        } else
+        {
+            System.exit(0);
         }
 
         return eruit;
     }
 
-    protected static ImageIcon createImageIcon(String deImageFile, int schermHoogte, int schermBreedte) throws IOException, NullPointerException {
+    protected static ImageIcon createImageIcon(String deImageFile, int schermHoogte, int schermBreedte) throws IOException, NullPointerException
+    {
         double quotientSchermWH, quotientImageWH;
         Image imageVooricon;
         imageFile = new File(deImageFile);
@@ -184,7 +214,8 @@ public class viewClass {
 
         quotientSchermWH = schermBreedte / (double) schermHoogte;
         quotientImageWH = widthImageToBeDisplayed / (double) heightImageToBeDisplayed;
-        if (quotientSchermWH > quotientImageWH) {
+        if (quotientSchermWH > quotientImageWH)
+        {
             // schalen op hoogte
 //            imageVooricon = imageToBeDisplayed.getScaledInstance(-1, schermHoogte, Image.SCALE_FAST);
             imageVooricon = imageToBeDisplayed.getScaledInstance(-1, schermHoogte, Image.SCALE_SMOOTH);
@@ -193,7 +224,8 @@ public class viewClass {
 //            System.out.print("schalen op hoogte , H = " + imageHoogte + " B=" + imageBreedte + " ");
 //            schaal = schermHoogte / (double) heightImageToBeDisplayed;
 
-        } else {
+        } else
+        {
             // schalen op breedte
 //            imageVooricon = imageToBeDisplayed.getScaledInstance(schermBreedte, -1, Image.SCALE_FAST);
             imageVooricon = imageToBeDisplayed.getScaledInstance(schermBreedte, -1, Image.SCALE_SMOOTH);
@@ -205,7 +237,8 @@ public class viewClass {
         return new ImageIcon(imageVooricon);
     }
 
-    Vector getFilesInDirectory(String erin) throws IOException {
+    Vector getFilesInDirectory(String erin) throws IOException
+    {
 //        Vector eruit = new Vector();
         File startFile = new File(erin);
         File startDirFile;
@@ -216,7 +249,8 @@ public class viewClass {
         recursief = Boolean.FALSE;
         gekozenFileIndex = 0;
 
-        if (startFile.isDirectory()) {
+        if (startFile.isDirectory())
+        {
             recursief = Boolean.TRUE;
             getFilesRecursive(startFile); // vult public var filesInDirectory
             Collections.sort(filesInDirectory, Comparator.comparing(File::getAbsolutePath, new FilenameComparator()));
@@ -229,7 +263,8 @@ public class viewClass {
 //            }
             fileVector = filesInDirectory;
 
-        } else {
+        } else
+        {
 
             startDirFile = startFile.getParentFile();
             folder = new File(startDirFile.getAbsolutePath());
@@ -250,38 +285,52 @@ public class viewClass {
 //                }
 //            }
             // for each name in the path array
-            for (File fileInDir : listOfFiles) {
-                if (fileInDir.isFile()) {
-                    try {
+            for (File fileInDir : listOfFiles)
+            {
+                if (fileInDir.isFile())
+                {
+                    try
+                    {
                         String extension = fileInDir.getName().substring(fileInDir.getName().lastIndexOf("."));
-                        if (extension.toLowerCase().contains(".png")) {
+                        if (extension.toLowerCase().contains(".png"))
+                        {
 //                        System.out.println(fileInDir);
                             fileVector.addElement(fileInDir);
-                            if (fileInDir.equals(startFile)) {
+                            if (fileInDir.equals(startFile))
+                            {
                                 gekozenFileIndex = fileVector.size() - 1;
 
                             }
-                        } else {
-                            if (extension.toLowerCase().contains(".jpg")) {
+                        } else
+                        {
+                            if (extension.toLowerCase().contains(".jpg"))
+                            {
 //                        System.out.println(fileInDir);
                                 fileVector.addElement(fileInDir);
-                                if (fileInDir.equals(startFile)) {
+                                if (fileInDir.equals(startFile))
+                                {
                                     gekozenFileIndex = fileVector.size() - 1;
 
                                 }
-                            } else {
-                                if (extension.toLowerCase().contains(".jpeg")) {
+                            } else
+                            {
+                                if (extension.toLowerCase().contains(".jpeg"))
+                                {
 //                        System.out.println(fileInDir);
                                     fileVector.addElement(fileInDir);
-                                    if (fileInDir.equals(startFile)) {
+                                    if (fileInDir.equals(startFile))
+                                    {
                                         gekozenFileIndex = fileVector.size() - 1;
 
                                     }
-                                } else {
-                                    if (extension.toLowerCase().contains(".tiff")) {
+                                } else
+                                {
+                                    if (extension.toLowerCase().contains(".tiff"))
+                                    {
 //                        System.out.println(fileInDir);
                                         fileVector.addElement(fileInDir);
-                                        if (fileInDir.equals(startFile)) {
+                                        if (fileInDir.equals(startFile))
+                                        {
                                             gekozenFileIndex = fileVector.size() - 1;
 
                                         }
@@ -289,7 +338,8 @@ public class viewClass {
                                 }
                             }
                         }
-                    } catch (java.lang.StringIndexOutOfBoundsException e) {
+                    } catch (java.lang.StringIndexOutOfBoundsException e)
+                    {
                         System.out.println("gdview.viewClass.getFilesInDirectory() out of bounds exception " + fileInDir.getCanonicalPath());
                     }
                 }
@@ -301,90 +351,117 @@ public class viewClass {
         return fileVector;
     }
 
-    class muisLuisteraar extends MouseInputAdapter {
+    class muisLuisteraar extends MouseInputAdapter
+    {
 
-        public void mousePressed(MouseEvent event) {
+        public void mousePressed(MouseEvent event)
+        {
             int x = event.getX();
             int y = event.getY();
             int richting = 0;
 
 //        System.out.println("javaapplication2.muisLuisteraar.mouseReleased() " + viewClass.schaal );
 //            System.out.println("javaapplication2.muisLuisteraar.mouseReleased() " + event.getButton());
-            if (event.getButton() == BUTTON1) {
+            if (event.getButton() == BUTTON1)
+            {
                 richting = -1;
-                if (viewClass.indexfilesInDirectory == 0) {
+                if (viewClass.indexfilesInDirectory == 0)
+                {
                     richting = 0;
                 };
-            } else {
+            } else
+            {
                 richting = 1;
-                if (viewClass.indexfilesInDirectory == filesInDirectory.size() - 1) {
+                if (viewClass.indexfilesInDirectory == filesInDirectory.size() - 1)
+                {
                     richting = 0;
                 };
             }
             viewClass.indexfilesInDirectory += richting;
-            if (richting != 0) {
+            if (richting != 0)
+            {
                 verwerkNewImage();
             }
         }
     }
 
-    class toetsLuiteraar extends KeyAdapter {
+    class toetsLuiteraar extends KeyAdapter
+    {
 
         String strGetal;
 
-        public toetsLuiteraar() {
+        public toetsLuiteraar()
+        {
             strGetal = "";
         }
 
         @Override
-        public void keyPressed​(KeyEvent e) {
+        public void keyPressed​(KeyEvent e)
+        {
 
             super.keyTyped(e);
 
 //            System.out.println("toets " + e.getKeyCode());
             int richting = 0;
-            if ((e.getKeyCode() == KeyEvent.VK_LEFT) || (e.getKeyCode() == KeyEvent.VK_RIGHT)) {
-                if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+            if ((e.getKeyCode() == KeyEvent.VK_LEFT) || (e.getKeyCode() == KeyEvent.VK_RIGHT))
+            {
+                if (e.getKeyCode() == KeyEvent.VK_LEFT)
+                {
                     richting = -1;
-                    if (viewClass.indexfilesInDirectory == 0) {
+                    if (viewClass.indexfilesInDirectory == 0)
+                    {
                         richting = 0;
                     };
-                } else {
+                } else
+                {
                     richting = 1;
-                    if (viewClass.indexfilesInDirectory == filesInDirectory.size() - 1) {
+                    if (viewClass.indexfilesInDirectory == filesInDirectory.size() - 1)
+                    {
                         richting = 0;
                     }
                 }
                 viewClass.indexfilesInDirectory += richting;
-                if (richting != 0) {
+                if (richting != 0)
+                {
                     verwerkNewImage();
                 }
-            } else {
-                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            } else
+            {
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
+                {
                     System.exit(0);
-                } else {
-                    if ((e.getKeyCode() >= KeyEvent.VK_0) && (e.getKeyCode() <= KeyEvent.VK_9)) {
+                } else
+                {
+                    if ((e.getKeyCode() >= KeyEvent.VK_0) && (e.getKeyCode() <= KeyEvent.VK_9))
+                    {
                         String strKeyWaarde = "";
                         int numKeyWaarde = e.getKeyCode() - 48;
                         strKeyWaarde = String.valueOf(numKeyWaarde);
 
                         strGetal = strGetal + strKeyWaarde;
-                    } else {
-                        if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+                    } else
+                    {
+                        if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
+                        {
                             int lengte = strGetal.length();
                             lengte--;
-                            if (lengte > 0) {
+                            if (lengte > 0)
+                            {
                                 strGetal = (String) strGetal.subSequence(0, lengte);
                             }
                         }
                     }
 
-                    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    if (e.getKeyCode() == KeyEvent.VK_ENTER)
+                    {
                         int getal = 0;
-                        if (!strGetal.isBlank()) {
-                            if (Integer.parseInt(strGetal) != 0) {
+                        if (!strGetal.isBlank())
+                        {
+//                            if (Integer.parseInt(strGetal) != 0)
+                            {
                                 getal = Integer.parseInt(strGetal);
-                                if (getal < viewClass.filesInDirectory.size()) {
+                                if (getal < viewClass.filesInDirectory.size())
+                                {
                                     viewClass.indexfilesInDirectory = getal;
                                 }
                                 verwerkNewImage();
@@ -398,14 +475,20 @@ public class viewClass {
         }
     }
 
-    private static void getFilesRecursive(File pFile) {
-        for (File files : pFile.listFiles()) {
-            if (files.isDirectory()) {
-                if (recursief) {
+    private static void getFilesRecursive(File pFile)
+    {
+        for (File files : pFile.listFiles())
+        {
+            if (files.isDirectory())
+            {
+                if (recursief)
+                {
                     getFilesRecursive(files);
                 }
-            } else {
-                if (isImage(files)) {
+            } else
+            {
+                if (isImage(files))
+                {
                     filesInDirectory.addElement(files);
                 }
             }
@@ -413,31 +496,42 @@ public class viewClass {
 
     }
 
-    static boolean isImage(File erin) {
-
+    static boolean isImage(File erin)
+    {
 //        System.out.println("gdview.viewClass.isImage()" + erin.getAbsolutePath());
         Boolean eruit = Boolean.FALSE;
-        try {
+        try
+        {
             String extension = erin.getName().substring(erin.getName().lastIndexOf("."));
-            if (extension.toLowerCase().contains(".png")) {
+            if (extension.toLowerCase().contains(".png"))
+            {
                 eruit = Boolean.TRUE;
-            } else {
-                if (extension.toLowerCase().contains(".jpg")) {
+            } else
+            {
+                if (extension.toLowerCase().contains(".jpg"))
+                {
                     eruit = Boolean.TRUE;
-                } else {
-                    if (extension.toLowerCase().contains(".jpeg")) {
+                } else
+                {
+                    if (extension.toLowerCase().contains(".jpeg"))
+                    {
                         eruit = Boolean.TRUE;
-                    } else {
-                        if (extension.toLowerCase().contains(".tiff")) {
+                    } else
+                    {
+                        if (extension.toLowerCase().contains(".tiff"))
+                        {
                             eruit = Boolean.TRUE;
                         }
                     }
                 }
             }
-        } catch (java.lang.StringIndexOutOfBoundsException e) {
-            try {
+        } catch (java.lang.StringIndexOutOfBoundsException e)
+        {
+            try
+            {
                 System.out.println("gdview.viewClass.getFilesInDirectory() out of bounds exception " + erin.getCanonicalPath());
-            } catch (IOException ex) {
+            } catch (IOException ex)
+            {
                 Logger.getLogger(viewClass.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
