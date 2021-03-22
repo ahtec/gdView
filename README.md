@@ -21,5 +21,4 @@ When an image is loaded you can navigate with:
   typing a number ( only on top of keyboard )  and pressing enter 
     then the image with that number is shown.
     
-    
-For some useles complicated reason I am suddenlu not able to put my changes, Contact me if you need the latest
+  
