@@ -38,7 +38,7 @@ public class viewClass
     public static Vector filesInDirectory;
     public static int gekozenFileIndex;
     private static boolean recursief;
-    String versie = " 22 maart 2021 V19";
+    String versie = " 23 maart 2021 V20";
 
     public viewClass(String parameterFile) throws IOException
     {
@@ -53,6 +53,7 @@ public class viewClass
         {
             gekozenFileIndex = 0;
             indexfilesInDirectory = 1;
+            recursief = Boolean.FALSE;
             filesInDirectory = getFilesInDirectory(parameterFile);
         }
 
@@ -80,6 +81,8 @@ public class viewClass
 
             FileDrop fileDrop = new FileDrop(frame, new FileDrop.Listener()
             {
+                private Object startFile;
+
                 public void filesDropped(java.io.File[] files)
                 {
                     for (int i = 0; i < files.length; i++)
@@ -88,10 +91,38 @@ public class viewClass
                         {
                             filesInDirectory.addElement(files[i]);
                             maxAantalImages++;
-                            indexfilesInDirectory = maxAantalImages;
+                            if (i == 0)
+                            {
+                                indexfilesInDirectory = maxAantalImages;
+                            }
+                        } else
+                        {
+//                            System.out.println(".filesDropped()");
+                            if (files[i].isDirectory())
+                            {
+//                                System.out.println(".filesDropped() in de if");
+                                getFilesInDirectoryFile(files[i]);
+                            }
                         }
                     }
                     verwerkNewImage();
+                }
+
+                private void getFilesInDirectoryFile(File erin)
+                {
+
+//                    File startDirFile = file.getParentFile();
+//                    File folder = new File(startDirFile.getAbsolutePath());
+                    File[] listOfFiles = erin.listFiles();
+                    Arrays.sort(listOfFiles, Comparator.comparing(File::getName, new FilenameComparator()));
+                    for (File files : listOfFiles)
+                    {
+                        if (isImage(files))
+                        {
+                            filesInDirectory.addElement(files);
+                            maxAantalImages++;
+                        }
+                    }
                 }
             }
             ); // end FileDrop.Listener
@@ -182,7 +213,7 @@ public class viewClass
 
 //        } else
 //        {
-            fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 //        FileNameExtensionFilter filter = new FileNameExtensionFilter(
 //                "JPG & GIF Images", "jpg", "gif", "png", "jpeg", "tiff");
 //        fc.setFileFilter(filter);
@@ -246,12 +277,12 @@ public class viewClass
         File folder;
         Vector fileVector;
         fileVector = new Vector();
-        recursief = Boolean.FALSE;
+//        recursief = Boolean.FALSE;
         gekozenFileIndex = 0;
 
         if (startFile.isDirectory())
         {
-            recursief = Boolean.TRUE;
+//            recursief = Boolean.TRUE;
             getFilesRecursive(startFile); // vult public var filesInDirectory
             Collections.sort(filesInDirectory, Comparator.comparing(File::getAbsolutePath, new FilenameComparator()));
 
@@ -500,39 +531,45 @@ public class viewClass
     {
 //        System.out.println("gdview.viewClass.isImage()" + erin.getAbsolutePath());
         Boolean eruit = Boolean.FALSE;
-        try
+        String naamFile = erin.getName();
+        if (naamFile.lastIndexOf(".") > 0)
         {
-            String extension = erin.getName().substring(erin.getName().lastIndexOf("."));
-            if (extension.toLowerCase().contains(".png"))
+            try
             {
-                eruit = Boolean.TRUE;
-            } else
-            {
-                if (extension.toLowerCase().contains(".jpg"))
+//                String extension = erin.getName().substring(erin.getName().lastIndexOf("."));
+                String extension = naamFile.substring(naamFile.lastIndexOf("."));
+                if (extension.toLowerCase().contains(".png"))
                 {
                     eruit = Boolean.TRUE;
                 } else
                 {
-                    if (extension.toLowerCase().contains(".jpeg"))
+                    if (extension.toLowerCase().contains(".jpg"))
                     {
                         eruit = Boolean.TRUE;
                     } else
                     {
-                        if (extension.toLowerCase().contains(".tiff"))
+                        if (extension.toLowerCase().contains(".jpeg"))
                         {
                             eruit = Boolean.TRUE;
+                        } else
+                        {
+                            if (extension.toLowerCase().contains(".tiff"))
+                            {
+                                eruit = Boolean.TRUE;
+                            }
                         }
                     }
                 }
-            }
-        } catch (java.lang.StringIndexOutOfBoundsException e)
-        {
-            try
+            } catch (java.lang.StringIndexOutOfBoundsException e)
             {
-                System.out.println("gdview.viewClass.getFilesInDirectory() out of bounds exception " + erin.getCanonicalPath());
-            } catch (IOException ex)
-            {
-                Logger.getLogger(viewClass.class.getName()).log(Level.SEVERE, null, ex);
+                try
+                {
+//                    Logger.getLogger(viewClass.class.getName()).log(Level.SEVERE, null, e);
+                    System.out.println("gdview.viewClass.getFilesInDirectory() out of bounds exception " + erin.getCanonicalPath());
+                } catch (IOException ex)
+                {
+                    Logger.getLogger(viewClass.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
         return eruit;
