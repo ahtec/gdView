@@ -60,7 +60,6 @@ public class viewClass
         if (filesInDirectory.isEmpty())
         {
             JOptionPane.showMessageDialog(null, "Geen imgages gevonden", versie, 1);
-//            System.out.println("gdview.viewClass.<init>() geen imgages gevonden");
         } else
         {
             File f = (File) filesInDirectory.elementAt(gekozenFileIndex);
@@ -76,9 +75,7 @@ public class viewClass
             frame = new JFrame(absoluutPath);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setTitle(viewClass.indexfilesInDirectory + " " + viewClass.maxAantalImages + " " + absoluutPath + versie);
-//        frame.setBackground(Color.BLACK);
             pane = new JPanel();
-
             FileDrop fileDrop = new FileDrop(frame, new FileDrop.Listener()
             {
                 private Object startFile;
@@ -97,33 +94,25 @@ public class viewClass
                             }
                         } else
                         {
-//                            System.out.println(".filesDropped()");
                             if (files[i].isDirectory())
                             {
-//                                System.out.println(".filesDropped() in de if");
-                                getFilesInDirectoryFile(files[i]);
+                                File[] listOfFiles = files[i].listFiles();
+                                Arrays.sort(listOfFiles, Comparator.comparing(File::getName, new FilenameComparator()));
+                                for (File fileInDir : listOfFiles)
+                                {
+                                    if (isImage(fileInDir))
+                                    {
+                                        filesInDirectory.addElement(fileInDir);
+                                        maxAantalImages++;
+                                    }
+                                }
+
                             }
                         }
                     }
                     verwerkNewImage();
                 }
 
-                private void getFilesInDirectoryFile(File erin)
-                {
-
-//                    File startDirFile = file.getParentFile();
-//                    File folder = new File(startDirFile.getAbsolutePath());
-                    File[] listOfFiles = erin.listFiles();
-                    Arrays.sort(listOfFiles, Comparator.comparing(File::getName, new FilenameComparator()));
-                    for (File files : listOfFiles)
-                    {
-                        if (isImage(files))
-                        {
-                            filesInDirectory.addElement(files);
-                            maxAantalImages++;
-                        }
-                    }
-                }
             }
             ); // end FileDrop.Listener
 
